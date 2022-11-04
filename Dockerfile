@@ -35,6 +35,7 @@ COPY gunicorn.ini manage.py ./
 #COPY ledger ./ledger
 RUN touch /app/.env
 COPY queuewaiting ./queuewaiting
+RUN mkdir /app/logs
 RUN python manage.py collectstatic --noinput
 #RUN apt-get install --no-install-recommends -y python-pil
 EXPOSE 8080
