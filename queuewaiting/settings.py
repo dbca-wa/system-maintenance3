@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 #from dbca_utils.utils import env
 from pathlib import Path
 from confy import env, database
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
