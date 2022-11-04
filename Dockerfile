@@ -1,5 +1,5 @@
 # Prepare the base environment.
-FROM ubuntu:22.04 as builder_base_parkstay
+FROM ubuntu:22.04 as builder_base_queuewaiting
 MAINTAINER asi@dbca.wa.gov.au
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Australia/Perth
@@ -15,7 +15,7 @@ RUN apt-get install --no-install-recommends -y sqlite3 vim postgresql-client ssh
 RUN ln -s /usr/bin/python3 /usr/bin/python 
 RUN pip install --upgrade pip
 # Install Python libs from requirements.txt.
-FROM builder_base_parkstay as python_libs_parkstay
+FROM builder_base_parkstay as python_libs_queuewaiting
 WORKDIR /app
 COPY requirements.txt ./
 RUN pip3 install --no-cache-dir -r requirements.txt \
@@ -25,7 +25,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt \
   && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
 
 # Install the project (ensure that frontend projects have been built prior to this step).
-FROM python_libs_parkstay
+FROM python_libs_queuewaiting
 COPY timezone /etc/timezone
 ENV TZ=Australia/Perth
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

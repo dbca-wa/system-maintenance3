@@ -6,6 +6,7 @@
 
 ```
 DEBUG=False  
+SECRET_KEY=
 QUEUE_GROUP_NAME="queue1"   
 QUEUE_DOMAIN="dbca.wa.gov.au"   
 QUEUE_URL="https://queue.dbca.wa.gov.au"   
