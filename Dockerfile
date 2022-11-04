@@ -15,7 +15,7 @@ RUN apt-get install --no-install-recommends -y sqlite3 vim postgresql-client ssh
 RUN ln -s /usr/bin/python3 /usr/bin/python 
 RUN pip install --upgrade pip
 # Install Python libs from requirements.txt.
-FROM builder_base_parkstay as python_libs_queuewaiting
+FROM builder_base_queuewaiting as python_libs_queuewaiting
 WORKDIR /app
 COPY requirements.txt ./
 RUN pip3 install --no-cache-dir -r requirements.txt \
@@ -29,7 +29,6 @@ FROM python_libs_queuewaiting
 COPY timezone /etc/timezone
 ENV TZ=Australia/Perth
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-COPY cron /etc/cron.d/dockercron
 COPY startup.sh /
 RUN chmod 755 /startup.sh
 COPY gunicorn.ini manage.py ./
