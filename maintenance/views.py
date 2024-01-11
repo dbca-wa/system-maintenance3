@@ -18,17 +18,22 @@ class WaitingPage(TemplateView):
 
     template_name = 'maintenance/home.html'
     def render_to_response(self, context):
+        PAGE_TYPE = settings.PAGE_TYPE
+        
+        if PAGE_TYPE is None:
+            pass
+        else:
+            if PAGE_TYPE == 'parkstay':
+                self.template_name = 'maintenance/home-parkstay.html'
 
         template = get_template(self.template_name)
         #context['csrf_token_value'] = get_token(self.request)
         response = HttpResponse(template.render(context))
-        response["Access-Control-Allow-Headers"] = "*"
-        #response["X-Frame-Options"] = "ALLOW-FROM https://mooring-uat.dbca.wa.gov.au"
+        response["Access-Control-Allow-Headers"] = "*"       
         return response
 
     def get_context_data(self, **kwargs):
-        context = super(WaitingPage, self).get_context_data(**kwargs)
-        context['QUEUE_URL'] = env('QUEUE_URL','')
+        context = super(WaitingPage, self).get_context_data(**kwargs)        
         context['settings'] = settings
         return context
 

@@ -2,13 +2,13 @@
 	"name": "System Maintaince Page",
 	"image": "dbcawa/docker_app_dev:system-maintenance3_dev_latest",
 	"remoteUser": "container",
-	"workspaceFolder": "/data/data/projects/ledger",
+	"workspaceFolder": "/data/data/projects/system-maintenance3",
 	"mounts": ["type=bind,source=/data/,target=/data/",
 	           "type=bind,source=/data/data/containerhome/,target=/home/container/"
 	          ],	
-	"appPort": [ "7023:8080","9161:9161","9162:9162","9163:9163","9164:9164","9165:9164" ],
+	"appPort": [ "7023:8080","9161:9161","9162:9162","9163:9163","9164:9164","9165:9165" ],
 	"runArgs": ["--env-file","${localEnv:HOME}/vscode-env/system-maintenance3.env",
 		   "--hostname","system-maintenance3-dev"
 		   ],
-	"forwardPorts": [9161,9162,9163,9164,9165,]
+	"forwardPorts": [9161,9162,9163,9164,9165]
 }
