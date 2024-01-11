@@ -38,6 +38,8 @@ QUEUE_ACTIVE_HOSTS = env('QUEUE_ACTIVE_HOSTS','')
 WAIT_LOADING_SECONDS = env('WAIT_LOADING_SECONDS','30')
 CONTINUE_URL = env('CONTINUE_URL','')
 
+PAGE_TYPE = env('PAGE_TYPE',None)
+
 #WAITING_QUEUE_ENABLED = env('WAITING_QUEUE_ENABLED','')
 
 # Application definition
@@ -48,7 +50,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'maintenance'
+    'maintenance',
+    'django_cron',
+    'appmonitor_client'
 ]
 
 MIDDLEWARE = [
@@ -90,10 +94,13 @@ WSGI_APPLICATION = 'maintenance.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db/db.sqlite3',
     }
 }
 
+CRON_CLASSES = [
+    'appmonitor_client.cron.CronJobAppMonitorClient',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
