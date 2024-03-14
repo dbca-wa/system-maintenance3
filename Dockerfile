@@ -38,6 +38,8 @@ COPY maintenance ./maintenance
 RUN mkdir /app/logs
 RUN python manage.py collectstatic --noinput
 #RUN apt-get install --no-install-recommends -y python-pil
+RUN echo $VERSION_TAG > /etc/docker_version_tag
+RUN echo $VERSION_TAG_DATE > /etc/docker_version_tag_date
 EXPOSE 8080
 HEALTHCHECK --interval=1m --timeout=5s --start-period=10s --retries=3 CMD ["wget", "-q", "-O", "-", "http://localhost:8080/"]
 CMD ["/startup.sh"]
