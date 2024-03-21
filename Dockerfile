@@ -30,6 +30,7 @@ COPY timezone /etc/timezone
 ENV TZ=Australia/Perth
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY startup.sh /
+COPY bin/health_check.sh /bin/health_check.sh
 RUN chmod 755 /startup.sh
 COPY gunicorn.ini manage.py ./
 #COPY ledger ./ledger
