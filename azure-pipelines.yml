@@ -24,9 +24,9 @@ stages:
       vmImage: ubuntu-latest
     steps:    
     - task: Docker@2
-      displayName: Build an image and Push
+      displayName: Build Image
       inputs:
-        command: buildAndPush
+        command: build
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         arguments: ' --build-arg VERSION_TAG_DATE=$(tagDate)'
         tags: |
@@ -38,6 +38,19 @@ stages:
         DOCKER_BUILDKIT: 1
         VERSION_TAG: $(tag)
         VERSION_TAG_DATE: $(tagDate)
+    - task: Docker@2
+      displayName: Push Image
+      inputs:
+        command: Push
+        tags: |
+              latest
+              $(tagDate)
+        containerRegistry: DockerHub
+        repository: dbcawa/system-maintenance3
+      env:
+        DOCKER_BUILDKIT: 1
+        VERSION_TAG: $(tag)
+        VERSION_TAG_DATE: $(tagDate)        
     - task: Docker@2
       displayName: Dev Build image and Push
       inputs:
