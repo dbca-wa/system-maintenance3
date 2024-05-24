@@ -22,13 +22,13 @@ stages:
     displayName: Build
     pool:
       vmImage: ubuntu-latest
-    steps:
-    - bash: export VERSION_TAG_DATE=$(tagDate)
+    steps:    
     - task: Docker@2
       displayName: Build an image and Push
       inputs:
         command: buildAndPush
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+        arguments: --build-arg VERSION_TAG_DATE=$(tagDate)
         tags: |
               latest
               $(tagDate)
