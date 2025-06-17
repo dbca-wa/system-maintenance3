@@ -18,6 +18,8 @@ from django.urls import path
 from maintenance import views
 from django.conf.urls.static import static
 
+
+handler404 = 'maintenance.views.handler404'
 urlpatterns = [
     #path('admin/', admin.site.urls),
     path('', views.WaitingPage.as_view()), 

@@ -8,10 +8,6 @@ import confy
 def main():
     """Run administrative tasks."""
 
-    dot_env = os.path.join(os.getcwd(), '.env')
-    if os.path.exists(dot_env):
-            confy.read_environment_file()
-
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'maintenance.settings')
     try:

@@ -13,6 +13,6 @@ class CacheControl(object):
 
     def __call__(self, request):
        response= self.get_response(request)
-       response['Cache-Control'] = 'public, max-age=300'
+       response['Cache-Control'] = 'public, max-age=30'
        return response
 
