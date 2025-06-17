@@ -12,6 +12,10 @@ from django.views.generic.base import View, TemplateView
 from django.template.loader import get_template
 from django.template.loader import render_to_string
 from confy import env
+from django.http import HttpResponseRedirect
+
+def handler404(request, *args, **kwargs):
+    return HttpResponseRedirect('/')
 
 class WaitingPage(TemplateView):
     # preperation to replace old homepage with screen designs..
@@ -25,11 +29,13 @@ class WaitingPage(TemplateView):
         else:
             if PAGE_TYPE == 'parkstay':
                 self.template_name = 'maintenance/home-parkstay.html'
+            if PAGE_TYPE == 'ria':
+                self.template_name = 'maintenance/home-ria.html'                
 
         template = get_template(self.template_name)
         #context['csrf_token_value'] = get_token(self.request)
         response = HttpResponse(template.render(context))
-        response["Access-Control-Allow-Headers"] = "*"       
+        response["Access-Control-Allow-Headers"] = "*"           
         return response
 
     def get_context_data(self, **kwargs):
