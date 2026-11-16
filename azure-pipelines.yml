@@ -12,6 +12,8 @@ variables:
   tag: '$(Build.BuildId)'
   tagDate: $[ format('{0:yyyy}.{0:MM}.{0:dd}.{0:HH}.{0:mm}{0:ss}', pipeline.startTime) ]
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
+  imageName: 'ghcr.io/dbca-wa/system-maintenance3'
+  devImageName: 'ghcr.io/dbca-wa/docker_app_dev'
 
 stages:
 - stage: Build
@@ -22,44 +24,71 @@ stages:
     displayName: Build
     pool:
       vmImage: ubuntu-latest
-    steps:    
+    steps:
+    # 1. Extract the short SHA
+    - script: |
+        SHORT_SHA=$(git rev-parse --short=7 $(Build.SourceVersion))
+        echo "##vso[task.setvariable variable=shortSha]$SHORT_SHA"
+      displayName: 'Generate Short Git SHA'
+    # 2. Authenticate to GHCR natively before running commands
     - task: Docker@2
-      displayName: Build Image
+      displayName: 'Login to GHCR'
       inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
-        arguments: ' --build-arg VERSION_TAG_DATE=$(tagDate)'
-        tags: |
-              latest
-              $(tagDate)
-        containerRegistry: DockerHub
-        repository: dbcawa/system-maintenance3
-      env:
-        DOCKER_BUILDKIT: 1
-        VERSION_TAG: $(tag)
-        VERSION_TAG_DATE: $(tagDate)
-    - task: Docker@2
-      displayName: Push Image
-      inputs:
-        command: Push
-        tags: |
-              latest
-              $(tagDate)
-        containerRegistry: DockerHub
-        repository: dbcawa/system-maintenance3
-      env:
-        DOCKER_BUILDKIT: 1
-        VERSION_TAG: $(tag)
-        VERSION_TAG_DATE: $(tagDate)        
-    - task: Docker@2
-      displayName: Dev Build image and Push
-      inputs:
-        command: buildAndPush
-        dockerfile: '$(Build.SourcesDirectory)/dockerdev/Dockerfile'
-        tags: |
-              system-maintenance3_dev_latest
-              system-maintenance3_dev_$(tagDate)
-        containerRegistry: DockerHub
-        repository: dbcawa/docker_app_dev
-      env:
-        DOCKER_BUILDKIT: 1
+        command: login
+        containerRegistry: DockerGitHub
+    # 3. FIXED: Build Main Image using native Bash to force arguments parsing
+    - bash: |
+        export DOCKER_BUILDKIT=1
+        docker build \
+          --build-arg IMAGE_TAG="$(tagDate)-$(shortSha)" \
+          --build-arg IMAGE_NAME="$(imageName)" \
+          -t $(imageName):latest \
+          -t $(imageName):$(tagDate)-$(shortSha) \
+          -f $(Build.SourcesDirectory)/Dockerfile .
+      displayName: 'Docker Build Main Image'     
+
+    # 4. Push Main Image tags
+    - bash: |
+        docker push $(imageName):latest
+        docker push $(imageName):$(tagDate)-$(shortSha)
+      displayName: 'Push Main Image'
+
+    # 5. FIXED: Build Dev Image using native Bash
+    - bash: |
+        export DOCKER_BUILDKIT=1
+        docker build \
+          --build-arg IMAGE_TAG="$(tagDate)-$(shortSha)" \
+          --build-arg IMAGE_NAME="$(devImageName)" \
+          -t $(devImageName):system-maintenance3_latest \
+          -t $(devImageName):system-maintenance3_$(tagDate)-$(shortSha) \
+          -f $(Build.SourcesDirectory)/dockerdev/Dockerfile .
+      displayName: 'Docker Build Dev Image'
+
+    # 6. Push Dev Image tags
+    - bash: |
+        docker push $(devImageName):system-maintenance3_latest
+        docker push $(devImageName):system-maintenance3_$(tagDate)-$(shortSha)
+      displayName: 'Push Dev Image'
+
+    # 7. Purge images
+    - script: |
+        docker system prune -af
+      displayName: 'Cleanup Docker space'   
+
+    # 8. Scan image
+    - bash: |
+        mkdir -p "$(Build.ArtifactStagingDirectory)"
+        chmod 777 "$(Build.ArtifactStagingDirectory)"
+        docker run --pull always --rm -e DOCKER_IMAGE="$(imageName):$(tagDate)-$(shortSha)" -v "$(Build.ArtifactStagingDirectory):/artifacts" ghcr.io/dbca-wa/docker-apps-dev:security_scan_tools_base_latest  bash -c '
+            /app/scan_image.sh    
+            cp /tmp/scans/vulnerabilities.csv /artifacts/
+            cp /tmp/scans/vulnerabilities.xlsx /artifacts/
+            cp /tmp/scans/sbom.json /artifacts/
+        '
+      displayName: Run security scan
+     
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: security-scan
+      displayName: Publish scan results        
+      
+      
