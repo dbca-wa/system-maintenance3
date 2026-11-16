@@ -11,6 +11,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Australia/Perth
 ENV PRODUCTION_EMAIL=True
 ENV SECRET_KEY="ThisisNotRealKey"
+ENV VIRTUAL_ENV=/app/venv
+
 RUN env
 RUN apt-get clean
 RUN apt-get update
