@@ -39,6 +39,7 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Install the project (ensure that frontend projects have been built prior to this step).
+COPY --chown=oim:oim  python-cron ./
 COPY --chown=oim:oim  startup.sh /
 RUN chmod 755 /startup.sh
 COPY --chown=oim:oim  gunicorn.ini manage.py ./
