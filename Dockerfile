@@ -1,7 +1,7 @@
 # Prepare the base environment.
 ARG IMAGE_TAG
 ARG IMAGE_NAME
-FROM ghcr.io/dbca-wa/docker-apps-dev:ubuntu_2604_base_python_node AS builder_base_maintenance
+FROM ghcr.io/dbca-wa/docker-apps-dev:ubuntu_2604_base_python AS builder_base_maintenance
 ARG IMAGE_TAG
 ARG IMAGE_NAME
 RUN echo "Building version: $IMAGE_TAG for $IMAGE_NAME"
